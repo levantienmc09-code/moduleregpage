@@ -1,0 +1,170 @@
+cd /sdcard/
+WHITE="\033[1;97m"
+YELLOW="\033[1;93m"
+RESET="\033[0m"
+
+gradient_total() {
+    local text="$1"
+    local len=${#text}
+    local start_r=255 start_g=160 start_b=120
+    local mid_r=255 mid_g=120 mid_b=200
+    local end_r=255 end_g=255 end_b=100
+    local i char t r g b t2 result=""
+
+    for ((i=0;i<len;i++)); do
+        char="${text:i:1}"
+        if ((len>1)); then
+            t=$((i*1000/(len-1)))
+        else
+            t=0
+        fi
+        if (( t < 500 )); then
+            t2=$((t*1000/500))
+            r=$((start_r + (mid_r - start_r)*t2/1000))
+            g=$((start_g + (mid_g - start_g)*t2/1000))
+            b=$((start_b + (mid_b - start_b)*t2/1000))
+        else
+            t2=$(((t-500)*1000/500))
+            r=$((mid_r + (end_r - mid_r)*t2/1000))
+            g=$((mid_g + (end_g - mid_g)*t2/1000))
+            b=$((mid_b + (end_b - mid_b)*t2/1000))
+        fi
+        result+="\033[38;2;${r};${g};${b}m$char"
+    done
+    result+="$RESET"
+    echo -e "$result"
+}
+
+# Hàm ls nâng cao
+lscustom() {
+    local type="$1"
+    local count=0
+
+    shopt -s nullglob
+
+    case "$type" in
+        py|php|txt|json)
+            for f in *."$type"; do
+                printf "${WHITE}%s${RESET}\n" "$f"
+                ((count++))
+            done
+            gradient_total "Tổng: $count File $type"
+            ;;
+        thumuc)
+            for d in */; do
+                printf "${YELLOW}%s${RESET}\n" "${d%/}"
+                ((count++))
+            done
+            gradient_total "Tổng: $count Thư Mục"
+            ;;
+        all|"")
+            local count_dir=0 count_py=0 count_php=0 count_txt=0 count_json=0
+
+            for d in */; do
+                printf "${YELLOW}%s${RESET}\n" "${d%/}"
+                ((count_dir++))
+            done
+
+            for f in *; do
+                if [ -f "$f" ]; then
+                    case "$f" in
+                        *.py)  printf "${WHITE}%s${RESET}\n" "$f"; ((count_py++)) ;;
+                        *.php) printf "${WHITE}%s${RESET}\n" "$f"; ((count_php++)) ;;
+                        *.txt) printf "${WHITE}%s${RESET}\n" "$f"; ((count_txt++)) ;;
+                        *.json)printf "${WHITE}%s${RESET}\n" "$f"; ((count_json++)) ;;
+                        *)     printf "${WHITE}%s${RESET}\n" "$f" ;;
+                    esac
+                fi
+            done
+
+            gradient_total "Tổng: $count_dir Thư Mục | $count_py py | $count_php php | $count_txt txt | $count_json json"
+            ;;
+        *)
+            command ls --color=auto "$@"
+            ;;
+    esac
+}
+
+# --- Tạo alias ngắn gọn ---
+lspy()   { lscustom py; }
+lsphp()  { lscustom php; }
+lstxt()  { lscustom txt; }
+lsjson() { lscustom json; }
+lsth()   { lscustom thumuc; }
+lsall()  { lscustom all; }
+ls()     { lscustom all; }
+alias load="source ~/.bashrc"
+RESET="\e[0m"
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+echo -e "${RED}████████╗${GREEN}███████╗${YELLOW}██████╗${BLUE}░███╗░░░███╗${MAGENTA}██╗░░░██╗${CYAN}██╗░░██╗${RESET}"
+echo -e "${RED}╚══██╔══╝${GREEN}██╔════╝${YELLOW}██╔══██╗${BLUE}████╗░████║${MAGENTA}██║░░░██║${CYAN}╚██╗██╔╝${RESET}"
+echo -e "${RED}░░░██║░░░${GREEN}█████╗░░${YELLOW}██████╔╝${BLUE}██╔████╔██║${MAGENTA}██║░░░██║${CYAN}░╚███╔╝░${RESET}"
+echo -e "${RED}░░░██║░░░${GREEN}██╔══╝░░${YELLOW}██╔══██╗${BLUE}██║╚██╔╝██║${MAGENTA}██║░░░██║${CYAN}░██╔██╗░${RESET}"
+echo -e "${RED}░░░██║░░░${GREEN}███████╗${YELLOW}██║░░██║${BLUE}██║░╚═╝░██║${MAGENTA}╚██████╔╝${CYAN}██╔╝╚██╗${RESET}"
+echo -e "${RED}░░░╚═╝░░░${GREEN}╚══════╝${YELLOW}╚═╝░░╚═╝${BLUE}╚═╝░░░░░╚═╝${MAGENTA}░╚═════╝░${CYAN}╚═╝░░╚═╝${RESET}"
+
+RESET="\e[0m"
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+
+BANNER="${RED}████████╗${GREEN}███████╗${YELLOW}██████╗${BLUE}░███╗░░░███╗${MAGENTA}██╗░░░██╗${CYAN}██╗░░██╗${RESET}
+${RED}╚══██╔══╝${GREEN}██╔════╝${YELLOW}██╔══██╗${BLUE}████╗░████║${MAGENTA}██║░░░██║${CYAN}╚██╗██╔╝${RESET}
+${RED}░░░██║░░░${GREEN}█████╗░░${YELLOW}██████╔╝${BLUE}██╔████╔██║${MAGENTA}██║░░░██║${CYAN}░╚███╔╝░${RESET}
+${RED}░░░██║░░░${GREEN}██╔══╝░░${YELLOW}██╔══██╗${BLUE}██║╚██╔╝██║${MAGENTA}██║░░░██║${CYAN}░██╔██╗░${RESET}
+${RED}░░░██║░░░${GREEN}███████╗${YELLOW}██║░░██║${BLUE}██║░╚═╝░██║${MAGENTA}╚██████╔╝${CYAN}██╔╝╚██╗${RESET}
+${RED}░░░╚═╝░░░${GREEN}╚══════╝${YELLOW}╚═╝░░╚═╝${BLUE}╚═╝░░░░░╚═╝${MAGENTA}░╚═════╝░${CYAN}╚═╝░░╚═╝${RESET}"
+
+alias xoa='tput reset; echo -e "$BANNER"'
+port() {
+  local p=${1:-8000}
+
+  # Kill tất cả PHP server cũ (bất kỳ port)
+  PIDS=$(ps aux | grep php | grep -v grep | awk '{print $2}')
+  if [ -n "$PIDS" ]; then
+    echo "Killing old PHP server PID(s): $PIDS"
+    echo "$PIDS" | xargs -r kill -15
+    sleep 0.5
+  fi
+
+  echo "Starting php -S localhost:$p"
+  php -S "localhost:$p"
+}
+
+# ---- Chạy Python / PHP khi mở file ----
+command_not_found_handle() {
+    if [[ -f "$1" ]]; then
+        case "$1" in
+            *.py)
+                python "$1" "${@:2}"
+                return 0
+                ;;
+            *.php)
+                php "$1" "${@:2}"
+                return 0
+                ;;
+        esac
+    fi
+    echo "❌ File \"$1\" không tồn tại."
+    return 127
+}
+
+# ---- Thay alias -s py='python' bằng function cho bash ----
+py() {
+    python "$@"
+}
+
+
+export CHROME_BIN=/data/data/com.termux/files/usr/bin/chrome
+export PATH=$PATH:$PREFIX/bin
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
